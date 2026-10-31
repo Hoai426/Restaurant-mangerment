@@ -1,0 +1,35 @@
+name: Backend build
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths:
+      - "tip_dc13_be_restaurantmanagement-dev/**"
+      - ".github/workflows/backend-build.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: backend-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: tip_dc13_be_restaurantmanagement-dev
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Java 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: "21"
+          distribution: "temurin"
+          cache: "maven"
+          cache-dependency-path: tip_dc13_be_restaurantmanagement-dev/pom.xml
+
+      - name: Build with Maven Wrapper
+        run: ./mvnw -B clean package -DskipTests
