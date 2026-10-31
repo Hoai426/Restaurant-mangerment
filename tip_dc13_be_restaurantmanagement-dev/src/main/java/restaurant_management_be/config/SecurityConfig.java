@@ -70,6 +70,9 @@ public class SecurityConfig {
                                 "/auth/reset-password",
                                 "/auth/verify-email-update",
                                 "/auth/resend-email-update-otp",
+                                "/actuator/health",
+                                "/actuator/health/**",
+                                "/actuator/info",
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**",
                                 "/swagger-ui.html")
