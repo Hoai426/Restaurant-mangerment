@@ -37,7 +37,9 @@ Copy-Item .env.example .env
 | `DB_URL` | ✅ | — | `jdbc:mysql://host:3306/restaurant_management` |
 | `DB_USERNAME` / `DB_PASSWORD` | ✅ | — | Tài khoản MySQL |
 | `JWT_SECRET` | ✅ | — | Tối thiểu **32 byte**, sinh bằng `openssl rand -base64 48` |
-| `MAIL_USERNAME` / `MAIL_PASSWORD` | ✅ | — | Gmail + **App Password** (bật 2FA) |
+| `MAIL_HOST` / `MAIL_PORT` | ❌ | `smtp.gmail.com` / `587` | Render Free dùng Brevo: `smtp-relay.brevo.com` / `2525` |
+| `MAIL_USERNAME` / `MAIL_PASSWORD` | ✅ | — | Gmail App Password, hoặc Brevo SMTP login + SMTP key |
+| `MAIL_FROM` | ❌ | `MAIL_USERNAME` | Địa chỉ gửi hiển thị (Brevo: sender đã xác minh) |
 | `ADMIN_USERNAME` / `ADMIN_EMAIL` / `ADMIN_PASSWORD` | ✅ | — | Admin khởi tạo lần đầu |
 | `ADMIN_PHONE` | ❌ | `+1000000000` | Số điện thoại admin |
 | `CORS_ALLOWED_ORIGINS` | ❌ | `http://localhost:3000` | Danh sách origin FE, cách nhau dấu phẩy |
@@ -80,14 +82,50 @@ Mặc định `false` để Flyway dừng ngay thay vì âm thầm bỏ qua V1 t
 
 ## Deploy
 
-### PaaS (Render / Railway / Heroku)
+### Render Free (khuyến nghị cho demo đồ án)
 
-Do repo chứa cả FE và BE, phải đặt **Root Directory** = `tip_dc13_be_restaurantmanagement-dev`.
+Repo đã có `render.yaml` ở thư mục gốc. Cách nhanh nhất:
 
+1. Render Dashboard → **New** → **Blueprint** → chọn repo này.
+2. Render đọc `render.yaml`, tạo service `restaurant-backend` với:
+   - Root Directory: `tip_dc13_be_restaurantmanagement-dev`
+   - Dockerfile: `./Dockerfile`
+   - Health check: `/actuator/health`
+   - Region: Singapore
+3. Điền các biến `sync: false` khi được hỏi.
+4. Tạo MySQL miễn phí (Aiven MySQL Free hoặc TiDB Serverless) rồi điền `DB_URL`, `DB_USERNAME`, `DB_PASSWORD`.
+
+#### Email trên Render Free
+
+Render Free **chặn cổng 25/465/587** nên Gmail SMTP không dùng được. Dùng Brevo (free 300 mail/ngày):
+
+```
+MAIL_HOST=smtp-relay.brevo.com
+MAIL_PORT=2525
+MAIL_USERNAME=<SMTP login trong Brevo>
+MAIL_PASSWORD=<SMTP key, KHÔNG phải API key>
+MAIL_FROM=<email đã xác minh trên Brevo>
+```
+
+#### Tránh cold start khi demo
+
+Free service ngủ sau 15 phút, thức dậy mất ~1 phút. Trước buổi demo:
+- Mở sẵn `/actuator/health` để đánh thức service, hoặc
+- Tạo monitor miễn phí trên cron-job.org gọi `https://<service>.onrender.com/actuator/health` mỗi 10 phút.
+
+#### Giới hạn cần nhớ
+
+- 512MB RAM / 0.1 CPU → `JAVA_OPTS` đã set sẵn trong `render.yaml` (`-Xmx300m`).
+- Service có thể bị restart bất kỳ lúc nào.
+- Không dùng Render Free cho production thật.
+
+### PaaS khác (Railway / Heroku)
+
+- Root Directory: `tip_dc13_be_restaurantmanagement-dev`
 - Build command: `./mvnw -B clean package -DskipTests`
 - Start command: `java -jar target/restaurant-management-be-0.0.1-SNAPSHOT.jar`
 - Health check path: `/actuator/health`
-- Khai báo đủ biến môi trường ở trên; **không** cần set `PORT` (nền tảng tự inject, app đã đọc).
+- Không cần set `PORT` (nền tảng tự inject, app đã đọc).
 
 ### VPS (systemd)
 

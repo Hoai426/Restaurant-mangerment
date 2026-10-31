@@ -11,11 +11,20 @@ public class EmailServiceImpl implements EmailService {
 
     private final JavaMailSender mailSender;
 
+    @Value("${app.mail.from:}")
+    private String fromEmailOverride;
+
     @Value("${spring.mail.username}")
-    private String fromEmail;
+    private String mailUsername;
 
     public EmailServiceImpl(JavaMailSender mailSender) {
         this.mailSender = mailSender;
+    }
+
+    private String resolveFrom() {
+        return (fromEmailOverride == null || fromEmailOverride.isBlank())
+                ? mailUsername
+                : fromEmailOverride;
     }
 
     @Override
@@ -26,7 +35,7 @@ public class EmailServiceImpl implements EmailService {
     @Override
     public void sendOtpEmail(String toEmail, String otpCode, String subject) {
         SimpleMailMessage msg = new SimpleMailMessage();
-        msg.setFrom(fromEmail);
+        msg.setFrom(resolveFrom());
         msg.setTo(toEmail);
         msg.setSubject("[Restaurant] " + subject);
         msg.setText("Mã OTP của bạn là: " + otpCode

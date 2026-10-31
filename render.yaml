@@ -1,0 +1,47 @@
+# Render Blueprint — deploy backend tu repo monorepo.
+# Cach dung: Render Dashboard > New > Blueprint > chon repo nay.
+services:
+  - type: web
+    name: restaurant-backend
+    runtime: docker
+    plan: free
+    region: singapore
+    rootDir: tip_dc13_be_restaurantmanagement-dev
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /actuator/health
+    autoDeploy: true
+    envVars:
+      - key: DB_URL
+        sync: false
+      - key: DB_USERNAME
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      # Render Free chan cong 25/465/587 -> dung Brevo cong 2525
+      - key: MAIL_HOST
+        value: smtp-relay.brevo.com
+      - key: MAIL_PORT
+        value: "2525"
+      - key: MAIL_USERNAME
+        sync: false
+      - key: MAIL_PASSWORD
+        sync: false
+      - key: MAIL_FROM
+        sync: false
+      - key: ADMIN_USERNAME
+        value: admin
+      - key: ADMIN_EMAIL
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: ADMIN_PHONE
+        value: "+1000000000"
+      - key: CORS_ALLOWED_ORIGINS
+        sync: false
+      - key: JPA_SHOW_SQL
+        value: "false"
+      # 512MB RAM: gioi han heap de tranh bi Render kill
+      - key: JAVA_OPTS
+        value: "-Xms128m -Xmx300m -XX:MaxMetaspaceSize=96m -XX:+UseSerialGC -Xss512k"
