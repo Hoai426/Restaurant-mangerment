@@ -1,8 +1,10 @@
 # Maven
-.mvn/
+# Chi bo qua target/; giu Maven Wrapper de build on dinh tren moi may/CI
 target/
-mvnw
-mvnw.cmd
+.mvn/*
+!.mvn/wrapper/
+.mvn/wrapper/*
+!.mvn/wrapper/maven-wrapper.properties
 HELP.md
 
 # IntelliJ IDEA
