@@ -115,7 +115,7 @@ Free service ngủ sau 15 phút, thức dậy mất ~1 phút. Trước buổi de
 
 #### Giới hạn cần nhớ
 
-- 512MB RAM / 0.1 CPU → `JAVA_OPTS` đã set sẵn trong `render.yaml` (`-Xmx300m`).
+- 512MB RAM / 0.1 CPU → `JAVA_OPTS` đã set sẵn trong `render.yaml` (`-Xmx208m`, metaspace 160m).
 - Service có thể bị restart bất kỳ lúc nào.
 - Không dùng Render Free cho production thật.
 

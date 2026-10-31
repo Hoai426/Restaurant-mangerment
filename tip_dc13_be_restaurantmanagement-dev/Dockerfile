@@ -22,6 +22,6 @@ RUN chown app:app app.jar
 USER app
 EXPOSE 8080
 
-ENV JAVA_OPTS="-XX:MaxRAMPercentage=75 -XX:+UseG1GC"
+ENV JAVA_OPTS="-Xms64m -Xmx208m -XX:MaxMetaspaceSize=160m -XX:ReservedCodeCacheSize=48m -XX:+UseSerialGC -Xss512k"
 
 ENTRYPOINT ["sh", "-c", "exec java $JAVA_OPTS -jar app.jar"]

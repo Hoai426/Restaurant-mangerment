@@ -42,6 +42,6 @@ services:
         sync: false
       - key: JPA_SHOW_SQL
         value: "false"
-      # 512MB RAM: gioi han heap de tranh bi Render kill
+      # 512MB RAM: heap 208m + metaspace 160m de tranh OutOfMemoryError: Metaspace
       - key: JAVA_OPTS
-        value: "-Xms128m -Xmx300m -XX:MaxMetaspaceSize=96m -XX:+UseSerialGC -Xss512k"
+        value: "-Xms64m -Xmx208m -XX:MaxMetaspaceSize=160m -XX:ReservedCodeCacheSize=48m -XX:+UseSerialGC -Xss512k"
