@@ -1,0 +1,25 @@
+# Maven
+.mvn/
+target/
+mvnw
+mvnw.cmd
+HELP.md
+
+# IntelliJ IDEA
+.idea/
+*.iml
+
+# VS Code / Antigravity
+.vscode/
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db

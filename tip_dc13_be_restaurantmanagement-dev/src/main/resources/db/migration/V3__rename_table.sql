@@ -1,0 +1,1 @@
+ALTER TABLE restaurant_tables RENAME TO tables;
