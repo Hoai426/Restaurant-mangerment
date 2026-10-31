@@ -90,7 +90,7 @@ Repo đã có `render.yaml` ở thư mục gốc. Cách nhanh nhất:
 2. Render đọc `render.yaml`, tạo service `restaurant-backend` với:
    - Root Directory: `tip_dc13_be_restaurantmanagement-dev`
    - Dockerfile: `./Dockerfile`
-   - Health check: `/actuator/health`
+   - Health check: `/actuator/health/liveness`
    - Region: Singapore
 3. Điền các biến `sync: false` khi được hỏi.
 4. Tạo MySQL miễn phí (Aiven MySQL Free hoặc TiDB Serverless) rồi điền `DB_URL`, `DB_USERNAME`, `DB_PASSWORD`.
@@ -173,5 +173,5 @@ docker compose up --build
 - [ ] `CORS_ALLOWED_ORIGINS` trỏ đúng domain FE
 - [ ] `ADMIN_PASSWORD` mạnh, đổi sau lần đăng nhập đầu
 - [ ] DB trống hoặc đã baseline đúng (xem mục Flyway)
-- [ ] `/actuator/health` trả `UP`
+- [ ] `/actuator/health/liveness` trả `UP`
 - [ ] `JPA_SHOW_SQL=false`

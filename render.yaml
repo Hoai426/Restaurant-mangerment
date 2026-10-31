@@ -8,7 +8,7 @@ services:
     region: singapore
     rootDir: tip_dc13_be_restaurantmanagement-dev
     dockerfilePath: ./Dockerfile
-    healthCheckPath: /actuator/health
+    healthCheckPath: /actuator/health/liveness
     autoDeploy: true
     envVars:
       - key: DB_URL
