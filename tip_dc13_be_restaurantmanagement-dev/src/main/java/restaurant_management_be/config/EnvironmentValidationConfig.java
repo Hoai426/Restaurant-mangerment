@@ -10,6 +10,8 @@ import restaurant_management_be.common.exception.AppException;
 import restaurant_management_be.common.exception.ErrorCode;
 import restaurant_management_be.common.util.StringUtil;
 
+import java.nio.charset.StandardCharsets;
+
 @Component
 @Order(1)
 public class EnvironmentValidationConfig implements ApplicationRunner {
@@ -26,6 +28,8 @@ public class EnvironmentValidationConfig implements ApplicationRunner {
             "ADMIN_PASSWORD"
     };
 
+    private static final int MIN_JWT_SECRET_BYTES = 32;
+
     private final Environment environment;
 
     public EnvironmentValidationConfig(Environment environment) {
@@ -41,6 +45,14 @@ public class EnvironmentValidationConfig implements ApplicationRunner {
                         property + " chưa được cấu hình trong .env",
                         HttpStatus.INTERNAL_SERVER_ERROR);
             }
+        }
+
+        String jwtSecret = environment.getProperty("JWT_SECRET");
+        if (jwtSecret.getBytes(StandardCharsets.UTF_8).length < MIN_JWT_SECRET_BYTES) {
+            throw new AppException(
+                    ErrorCode.ENV_VALIDATION_FAILED,
+                    "JWT_SECRET phải dài tối thiểu 32 byte (256-bit) để ký HS256",
+                    HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }

@@ -33,6 +33,9 @@ public class DataInitializer implements CommandLineRunner {
     @Value("${admin.password:#{null}}")
     private String adminPassword;
 
+    @Value("${admin.phone:+1000000000}")
+    private String adminPhone;
+
     @Override
     public void run(String... args) {
         try {
@@ -75,7 +78,7 @@ public class DataInitializer implements CommandLineRunner {
         admin.setActive(true);
         admin.setEmailVerified(true);
         admin.setEmailVerifiedAt(LocalDateTime.now());
-        admin.setPhone("+1000000000");
+        admin.setPhone(adminPhone);
 
         try {
             userService.save(admin);

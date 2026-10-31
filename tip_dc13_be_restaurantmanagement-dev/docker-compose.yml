@@ -1,0 +1,49 @@
+# Chay full stack local: docker compose up --build
+# Yeu cau: tao file .env tu .env.example va dien cac bien bat buoc.
+services:
+  mysql:
+    image: mysql:8.4
+    container_name: restaurant-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: restaurant_management
+      MYSQL_ROOT_PASSWORD: "${DB_PASSWORD:-root}"
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p$${MYSQL_ROOT_PASSWORD} --silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: restaurant-backend
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      PORT: "8080"
+      DB_URL: "jdbc:mysql://mysql:3306/restaurant_management?serverTimezone=UTC&allowPublicKeyRetrieval=true&useSSL=false"
+      DB_USERNAME: "root"
+      DB_PASSWORD: "${DB_PASSWORD:-root}"
+      JWT_SECRET: "${JWT_SECRET:?JWT_SECRET is required}"
+      MAIL_USERNAME: "${MAIL_USERNAME:?MAIL_USERNAME is required}"
+      MAIL_PASSWORD: "${MAIL_PASSWORD:?MAIL_PASSWORD is required}"
+      ADMIN_USERNAME: "${ADMIN_USERNAME:-admin}"
+      ADMIN_EMAIL: "${ADMIN_EMAIL:-admin@example.com}"
+      ADMIN_PASSWORD: "${ADMIN_PASSWORD:?ADMIN_PASSWORD is required}"
+      ADMIN_PHONE: "${ADMIN_PHONE:-+1000000000}"
+      CORS_ALLOWED_ORIGINS: "${CORS_ALLOWED_ORIGINS:-http://localhost:3000}"
+      JPA_SHOW_SQL: "false"
+    ports:
+      - "8080:8080"
+
+volumes:
+  mysql_data:
