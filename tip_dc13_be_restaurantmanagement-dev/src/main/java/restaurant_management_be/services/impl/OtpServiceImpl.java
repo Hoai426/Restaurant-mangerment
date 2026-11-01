@@ -38,6 +38,10 @@ public class OtpServiceImpl implements OtpService {
     @Value("${otp.max-attempts:3}")
     private int otpMaxAttempts;
 
+    /** Chi dung khi demo: dat OTP co dinh, vi du 123456. */
+    @Value("${otp.demo-code:}")
+    private String otpDemoCode;
+
     public OtpServiceImpl(LoginOtpTokenRepository otpTokenRepository, ObjectMapper objectMapper,
             PlatformTransactionManager transactionManager) {
         this.otpTokenRepository = otpTokenRepository;
@@ -186,6 +190,9 @@ public class OtpServiceImpl implements OtpService {
     }
 
     private String generateCode() {
+        if (otpDemoCode != null && !otpDemoCode.isBlank()) {
+            return otpDemoCode.trim();
+        }
         return String.format("%06d", RANDOM.nextInt(1_000_000));
     }
 

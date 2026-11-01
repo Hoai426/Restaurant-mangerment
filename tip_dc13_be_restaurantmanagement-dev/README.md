@@ -40,6 +40,8 @@ Copy-Item .env.example .env
 | `MAIL_HOST` / `MAIL_PORT` | ❌ | `smtp.gmail.com` / `587` | Render Free dùng Brevo: `smtp-relay.brevo.com` / `2525` |
 | `MAIL_USERNAME` / `MAIL_PASSWORD` | ✅ | — | Gmail App Password, hoặc Brevo SMTP login + SMTP key |
 | `MAIL_FROM` | ❌ | `MAIL_USERNAME` | Địa chỉ gửi hiển thị (Brevo: sender đã xác minh) |
+| `MAIL_ENABLED` | ❌ | `true` | `false` = chế độ demo, không gửi mail thật |
+| `OTP_DEMO_CODE` | ❌ | — | OTP cố định khi `MAIL_ENABLED=false`, ví dụ `123456` |
 | `ADMIN_USERNAME` / `ADMIN_EMAIL` / `ADMIN_PASSWORD` | ✅ | — | Admin khởi tạo lần đầu |
 | `ADMIN_PHONE` | ❌ | `+1000000000` | Số điện thoại admin |
 | `CORS_ALLOWED_ORIGINS` | ❌ | `http://localhost:3000` | Danh sách origin FE, cách nhau dấu phẩy |
@@ -106,6 +108,19 @@ MAIL_USERNAME=<SMTP login trong Brevo>
 MAIL_PASSWORD=<SMTP key, KHÔNG phải API key>
 MAIL_FROM=<email đã xác minh trên Brevo>
 ```
+
+#### Chế độ demo không gửi mail
+
+Nếu chưa cấu hình được Brevo, có thể bỏ qua gửi mail thật khi demo:
+
+```env
+MAIL_ENABLED=false
+OTP_DEMO_CODE=123456
+```
+
+Khi đó mọi màn OTP (tạo tài khoản, quên mật khẩu, đổi email) dùng mã cố định **123456**, backend chỉ log OTP ra Render Logs và không gọi SMTP. Đặt lại `MAIL_ENABLED=true` và xóa `OTP_DEMO_CODE` để dùng email thật.
+
+> Chỉ dùng cho đồ án/demo, không dùng cho production.
 
 #### Tránh cold start khi demo
 

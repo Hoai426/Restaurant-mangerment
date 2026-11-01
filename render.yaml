@@ -30,6 +30,12 @@ services:
         sync: false
       - key: MAIL_FROM
         sync: false
+      # DEMO ONLY: bo qua gui mail that, OTP co dinh 123456.
+      # Xoa 2 bien nay khi da cau hinh Brevo that.
+      - key: MAIL_ENABLED
+        value: "false"
+      - key: OTP_DEMO_CODE
+        value: "123456"
       - key: ADMIN_USERNAME
         value: admin
       - key: ADMIN_EMAIL
