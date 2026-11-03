@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useSyncExternalStore } from "react";
+import { useEffect, useRef, useSyncExternalStore } from "react";
 import { createPortal } from "react-dom";
 
 const emptySubscribe = () => () => {};
@@ -20,6 +20,9 @@ export function Modal({
   maxWidthClass = "max-w-xl",
   ariaLabelledBy,
 }: ModalProps) {
+  const modalRef = useRef<HTMLDivElement>(null);
+  const previousActiveElementRef = useRef<HTMLElement | null>(null);
+
   const isMounted = useSyncExternalStore(
     emptySubscribe,
     () => true,
@@ -27,25 +30,68 @@ export function Modal({
   );
 
   useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "unset";
-    }
+    if (!isOpen) return;
+
+    // Save active element to restore focus when modal closes
+    previousActiveElementRef.current = document.activeElement as HTMLElement | null;
+
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    // Focus first focusable element inside modal
+    const focusTimer = setTimeout(() => {
+      if (!modalRef.current) return;
+      const focusable = modalRef.current.querySelectorAll<HTMLElement>(
+        'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+      );
+      if (focusable.length > 0) {
+        focusable[0].focus();
+      } else {
+        modalRef.current.focus();
+      }
+    }, 50);
 
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
+        e.stopPropagation();
         onClose();
+        return;
+      }
+
+      // Focus trap
+      if (e.key === "Tab" && modalRef.current) {
+        const focusables = modalRef.current.querySelectorAll<HTMLElement>(
+          'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+        );
+        if (focusables.length === 0) {
+          e.preventDefault();
+          return;
+        }
+
+        const first = focusables[0];
+        const last = focusables[focusables.length - 1];
+
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
       }
     };
 
-    if (isOpen) {
-      window.addEventListener("keydown", handleKeyDown);
-    }
+    window.addEventListener("keydown", handleKeyDown);
 
     return () => {
-      document.body.style.overflow = "unset";
+      clearTimeout(focusTimer);
+      document.body.style.overflow = originalOverflow;
       window.removeEventListener("keydown", handleKeyDown);
+
+      // Restore focus to previously active element
+      if (previousActiveElementRef.current && typeof previousActiveElementRef.current.focus === "function") {
+        previousActiveElementRef.current.focus();
+      }
     };
   }, [isOpen, onClose]);
 
@@ -53,10 +99,12 @@ export function Modal({
 
   return createPortal(
     <div
+      ref={modalRef}
       className="fixed inset-0 z-[100] overflow-y-auto"
       role="dialog"
       aria-modal="true"
       aria-labelledby={ariaLabelledBy}
+      tabIndex={-1}
     >
       {/* Blurred Backdrop */}
       <div
@@ -68,7 +116,10 @@ export function Modal({
       {/* Centering container */}
       <div className="flex min-h-full items-center justify-center p-4 sm:p-6 text-center">
         {/* Modal Content */}
-        <div className={`relative z-10 w-full my-auto text-left animate-fade-in-up ${maxWidthClass}`}>
+        <div
+          className={`relative z-10 w-full my-auto text-left animate-fade-in-up ${maxWidthClass}`}
+          onClick={(e) => e.stopPropagation()}
+        >
           {children}
         </div>
       </div>
@@ -76,3 +127,5 @@ export function Modal({
     document.body
   );
 }
+
+export default Modal;

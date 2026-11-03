@@ -9,6 +9,7 @@ import {
   ShieldCheckIcon,
   CalendarDaysIcon,
   PencilSquareIcon,
+  XCircleIcon,
 } from "@heroicons/react/24/outline";
 import { Alert } from "@/components/ui/Alert";
 import type { User } from "@/types/user";
@@ -36,7 +37,6 @@ export interface UserProfileFormProps {
   onCancel: () => void;
 }
 
-// Represents the state while waiting for an email-change OTP.
 interface PendingEmailVerification {
   tempToken: string;
   email: string;
@@ -51,7 +51,6 @@ export default function UserProfileForm({
     useState<PendingEmailVerification | null>(null);
   const [successMessage, setSuccessMessage] = useState("");
 
-  // OTP flow: backend has confirmed email change and issued a tempToken.
   if (pendingEmailVerification) {
     return (
       <ProfileEmailOtpVerification
@@ -69,7 +68,6 @@ export default function UserProfileForm({
     );
   }
 
-  // Edit mode — UserProfileEditForm owns its own mutation and error state.
   if (isEditing) {
     return (
       <UserProfileEditForm
@@ -87,254 +85,159 @@ export default function UserProfileForm({
     );
   }
 
-  // Read-only view mode.
   return (
-    <div className="bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden w-full max-w-4xl mx-auto flex flex-col max-h-[calc(100vh-3rem)] animate-fade-in-up">
+    <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden w-full max-w-4xl mx-auto flex flex-col max-h-[calc(100vh-3rem)] animate-fade-in-up">
       {/* Card header */}
-      <div className="px-6 sm:px-8 py-3.5 border-b border-gray-100 flex items-center gap-3.5 shrink-0 bg-white">
-        <div className="h-10 w-10 rounded-xl bg-gradient-to-tr from-rms-burgundy to-rms-gold p-0.5 shadow-sm flex-shrink-0">
-          <div className="h-full w-full bg-white rounded-xl flex items-center justify-center text-rms-charcoal">
-            <UserIcon className="w-5 h-5" />
+      <div className="px-6 sm:px-8 py-4 border-b border-gray-100 flex items-center justify-between gap-3.5 shrink-0 bg-white">
+        <div className="flex items-center gap-3">
+          <div className="h-10 w-10 rounded-xl bg-gradient-to-tr from-rms-burgundy to-rms-gold p-0.5 shadow-sm shrink-0">
+            <div className="h-full w-full bg-white rounded-[10px] flex items-center justify-center text-rms-burgundy">
+              <UserIcon className="w-5 h-5" />
+            </div>
+          </div>
+          <div>
+            <h1 className="text-lg font-bold text-rms-charcoal">Hồ sơ cá nhân</h1>
+            <p className="text-xs sm:text-sm text-gray-500 mt-0.5">
+              Thông tin chi tiết tài khoản của bạn.
+            </p>
           </div>
         </div>
-        <div>
-          <h1 className="text-lg font-bold text-rms-charcoal">Hồ sơ cá nhân</h1>
-          <p className="text-sm text-gray-500 mt-0.5">
-            Thông tin chi tiết tài khoản của bạn.
-          </p>
-        </div>
+
+        <button
+          type="button"
+          onClick={() => setIsEditing(true)}
+          className="h-9 px-3.5 inline-flex items-center justify-center gap-1.5 rounded-xl bg-rms-gradient text-white font-semibold text-xs sm:text-sm shadow-sm hover:shadow transition-all cursor-pointer"
+        >
+          <PencilSquareIcon className="w-4 h-4" />
+          <span>Chỉnh sửa</span>
+        </button>
       </div>
 
-      <div className="px-6 sm:px-8 py-3 sm:py-4 overflow-y-auto flex-1">
+      <div className="px-6 sm:px-8 py-5 overflow-y-auto flex-1 space-y-6">
         {successMessage && (
-          <div className="mb-4">
+          <div>
             <Alert type="success" message={successMessage} />
           </div>
         )}
 
-        <div className="rms-form">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-5 gap-y-2">
-            {/* Username */}
-            <div className="rms-field">
-              <label htmlFor="profile-username" className="rms-field__label">
-                Tên đăng nhập
-              </label>
-              <div className="rms-field__input-wrap">
-                <span className="rms-field__icon" aria-hidden="true">
-                  <UserIcon className="w-5 h-5" strokeWidth={1.8} />
-                </span>
-                <input
-                  id="profile-username"
-                  type="text"
-                  className="rms-field__input bg-gray-50 text-gray-500 cursor-not-allowed pl-11"
-                  value={user.username}
-                  readOnly
-                  aria-readonly="true"
-                />
-              </div>
+        {/* Section 1: Thông tin hệ thống */}
+        <div>
+          <h2 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">
+            Thông tin tài khoản hệ thống
+          </h2>
+          <dl className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            <div className="p-3.5 rounded-xl bg-gray-50 border border-gray-100">
+              <dt className="text-xs font-medium text-gray-500 flex items-center gap-1.5">
+                <UserIcon className="w-4 h-4 text-gray-400" />
+                <span>Tên đăng nhập</span>
+              </dt>
+              <dd className="mt-1 font-mono text-sm font-bold text-gray-900 truncate">
+                {user.username}
+              </dd>
             </div>
 
-            {/* Role */}
-            <div className="rms-field">
-              <label htmlFor="profile-role" className="rms-field__label">
-                Vai trò
-              </label>
-              <div className="rms-field__input-wrap">
-                <span className="rms-field__icon" aria-hidden="true">
-                  <ShieldCheckIcon className="w-5 h-5" strokeWidth={1.8} />
-                </span>
-                <input
-                  id="profile-role"
-                  type="text"
-                  className="rms-field__input bg-gray-50 text-gray-500 cursor-not-allowed pl-11"
-                  value={getRoleLabel(user.role)}
-                  readOnly
-                  aria-readonly="true"
-                />
-              </div>
+            <div className="p-3.5 rounded-xl bg-gray-50 border border-gray-100">
+              <dt className="text-xs font-medium text-gray-500 flex items-center gap-1.5">
+                <ShieldCheckIcon className="w-4 h-4 text-gray-400" />
+                <span>Vai trò</span>
+              </dt>
+              <dd className="mt-1 text-sm font-semibold text-rms-burgundy">
+                {getRoleLabel(user.role)}
+              </dd>
             </div>
 
-            {/* Status */}
-            <div className="rms-field">
-              <label htmlFor="profile-status" className="rms-field__label">
-                Trạng thái
-              </label>
-              <div className="rms-field__input-wrap">
-                <span className="rms-field__icon" aria-hidden="true">
-                  <CheckCircleIcon
-                    className={`w-5 h-5 ${
-                      user.isActive ? "text-green-500" : "text-gray-400"
-                    }`}
-                    strokeWidth={1.8}
-                  />
-                </span>
-                <input
-                  id="profile-status"
-                  type="text"
-                  className="rms-field__input bg-gray-50 text-gray-500 cursor-not-allowed pl-11"
-                  value={getStatusLabel(user.isActive)}
-                  readOnly
-                  aria-readonly="true"
-                />
-              </div>
+            <div className="p-3.5 rounded-xl bg-gray-50 border border-gray-100">
+              <dt className="text-xs font-medium text-gray-500 flex items-center gap-1.5">
+                <CheckCircleIcon className="w-4 h-4 text-gray-400" />
+                <span>Trạng thái</span>
+              </dt>
+              <dd className="mt-1 flex items-center gap-1.5 text-sm font-semibold">
+                {user.isActive ? (
+                  <span className="text-emerald-700">{getStatusLabel(user.isActive)}</span>
+                ) : (
+                  <span className="text-gray-500">{getStatusLabel(user.isActive)}</span>
+                )}
+              </dd>
             </div>
 
-            {/* Email Verified */}
-            <div className="rms-field">
-              <label
-                htmlFor="profile-email-verified"
-                className="rms-field__label"
-              >
-                Xác thực Email
-              </label>
-              <div className="rms-field__input-wrap">
-                <span className="rms-field__icon" aria-hidden="true">
-                  <CheckCircleIcon
-                    className={`w-5 h-5 ${
-                      user.emailVerified ? "text-green-500" : "text-gray-400"
-                    }`}
-                    strokeWidth={1.8}
-                  />
-                </span>
-                <input
-                  id="profile-email-verified"
-                  type="text"
-                  className="rms-field__input bg-gray-50 text-gray-500 cursor-not-allowed pl-11"
-                  value={user.emailVerified ? "Đã xác thực" : "Chưa xác thực"}
-                  readOnly
-                  aria-readonly="true"
-                />
-              </div>
+            <div className="p-3.5 rounded-xl bg-gray-50 border border-gray-100">
+              <dt className="text-xs font-medium text-gray-500 flex items-center gap-1.5">
+                <EnvelopeIcon className="w-4 h-4 text-gray-400" />
+                <span>Xác thực Email</span>
+              </dt>
+              <dd className="mt-1 flex items-center gap-1.5 text-sm font-semibold">
+                {user.emailVerified ? (
+                  <span className="inline-flex items-center gap-1 text-emerald-700">
+                    <CheckCircleIcon className="w-4 h-4 text-emerald-600" />
+                    <span>Đã xác thực</span>
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-1 text-amber-700">
+                    <XCircleIcon className="w-4 h-4 text-amber-600" />
+                    <span>Chưa xác thực</span>
+                  </span>
+                )}
+              </dd>
             </div>
 
-            {/* Created At */}
-            <div className="rms-field">
-              <label
-                htmlFor="profile-created-at"
-                className="rms-field__label"
-              >
-                Ngày tạo
-              </label>
-              <div className="rms-field__input-wrap">
-                <span className="rms-field__icon" aria-hidden="true">
-                  <CalendarDaysIcon
-                    className="w-5 h-5 text-gray-400"
-                    strokeWidth={1.8}
-                  />
-                </span>
-                <input
-                  id="profile-created-at"
-                  type="text"
-                  className="rms-field__input bg-gray-50 text-gray-500 cursor-not-allowed pl-11"
-                  value={formatDate(user.createdAt)}
-                  readOnly
-                  aria-readonly="true"
-                />
-              </div>
+            <div className="p-3.5 rounded-xl bg-gray-50 border border-gray-100">
+              <dt className="text-xs font-medium text-gray-500 flex items-center gap-1.5">
+                <CalendarDaysIcon className="w-4 h-4 text-gray-400" />
+                <span>Ngày tạo tài khoản</span>
+              </dt>
+              <dd className="mt-1 text-xs sm:text-sm font-medium text-gray-700 font-mono">
+                {formatDate(user.createdAt)}
+              </dd>
             </div>
 
-            {/* Updated At */}
-            <div className="rms-field">
-              <label
-                htmlFor="profile-updated-at"
-                className="rms-field__label"
-              >
-                Cập nhật lần cuối
-              </label>
-              <div className="rms-field__input-wrap">
-                <span className="rms-field__icon" aria-hidden="true">
-                  <CalendarDaysIcon
-                    className="w-5 h-5 text-gray-400"
-                    strokeWidth={1.8}
-                  />
-                </span>
-                <input
-                  id="profile-updated-at"
-                  type="text"
-                  className="rms-field__input bg-gray-50 text-gray-500 cursor-not-allowed pl-11"
-                  value={formatDate(user.updatedAt)}
-                  readOnly
-                  aria-readonly="true"
-                />
-              </div>
+            <div className="p-3.5 rounded-xl bg-gray-50 border border-gray-100">
+              <dt className="text-xs font-medium text-gray-500 flex items-center gap-1.5">
+                <CalendarDaysIcon className="w-4 h-4 text-gray-400" />
+                <span>Cập nhật gần nhất</span>
+              </dt>
+              <dd className="mt-1 text-xs sm:text-sm font-medium text-gray-700 font-mono">
+                {formatDate(user.updatedAt)}
+              </dd>
+            </div>
+          </dl>
+        </div>
+
+        {/* Section 2: Thông tin liên hệ cá nhân */}
+        <div className="pt-2 border-t border-gray-100">
+          <h2 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">
+            Thông tin liên hệ
+          </h2>
+          <dl className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div className="p-3.5 rounded-xl bg-white border border-gray-200">
+              <dt className="text-xs font-medium text-gray-500 flex items-center gap-1.5">
+                <UserIcon className="w-4 h-4 text-rms-gold" />
+                <span>Họ và tên</span>
+              </dt>
+              <dd className="mt-1 text-sm font-bold text-gray-900">
+                {user.fullName || "Chưa cập nhật"}
+              </dd>
             </div>
 
-            <div className="col-span-1 md:col-span-2 mt-2 mb-0.5 border-t border-gray-100 pt-3">
-              <h3 className="text-sm font-semibold text-gray-900 flex items-center gap-2">
-                <UserIcon className="w-4 h-4 text-rms-gold" strokeWidth={2} />
-                Thông tin cá nhân
-              </h3>
+            <div className="p-3.5 rounded-xl bg-white border border-gray-200">
+              <dt className="text-xs font-medium text-gray-500 flex items-center gap-1.5">
+                <EnvelopeIcon className="w-4 h-4 text-rms-gold" />
+                <span>Địa chỉ Email</span>
+              </dt>
+              <dd className="mt-1 text-sm font-medium text-gray-900 truncate">
+                {user.email || "Chưa cập nhật"}
+              </dd>
             </div>
 
-            {/* Full name */}
-            <div className="rms-field">
-              <label htmlFor="profile-fullname" className="rms-field__label">
-                Họ và tên
-              </label>
-              <div className="rms-field__input-wrap">
-                <span className="rms-field__icon" aria-hidden="true">
-                  <UserIcon
-                    className="w-5 h-5 text-gray-400"
-                    strokeWidth={1.8}
-                  />
-                </span>
-                <input
-                  id="profile-fullname"
-                  type="text"
-                  className="rms-field__input bg-gray-50 text-gray-500 cursor-not-allowed pl-11"
-                  value={user.fullName || "N/A"}
-                  readOnly
-                  aria-readonly="true"
-                />
-              </div>
+            <div className="p-3.5 rounded-xl bg-white border border-gray-200">
+              <dt className="text-xs font-medium text-gray-500 flex items-center gap-1.5">
+                <PhoneIcon className="w-4 h-4 text-rms-gold" />
+                <span>Số điện thoại</span>
+              </dt>
+              <dd className="mt-1 text-sm font-medium text-gray-900 font-mono">
+                {user.phone || "Chưa cập nhật"}
+              </dd>
             </div>
-
-            {/* Email */}
-            <div className="rms-field">
-              <label htmlFor="profile-email" className="rms-field__label">
-                Email
-              </label>
-              <div className="rms-field__input-wrap">
-                <span className="rms-field__icon" aria-hidden="true">
-                  <EnvelopeIcon
-                    className="w-5 h-5 text-gray-400"
-                    strokeWidth={1.8}
-                  />
-                </span>
-                <input
-                  id="profile-email"
-                  type="text"
-                  className="rms-field__input bg-gray-50 text-gray-500 cursor-not-allowed pl-11"
-                  value={user.email}
-                  readOnly
-                  aria-readonly="true"
-                />
-              </div>
-            </div>
-
-            {/* Phone */}
-            <div className="rms-field">
-              <label htmlFor="profile-phone" className="rms-field__label">
-                Số điện thoại
-              </label>
-              <div className="rms-field__input-wrap">
-                <span className="rms-field__icon" aria-hidden="true">
-                  <PhoneIcon
-                    className="w-5 h-5 text-gray-400"
-                    strokeWidth={1.8}
-                  />
-                </span>
-                <input
-                  id="profile-phone"
-                  type="text"
-                  className="rms-field__input bg-gray-50 text-gray-500 cursor-not-allowed pl-11"
-                  value={user.phone || "N/A"}
-                  readOnly
-                  aria-readonly="true"
-                />
-              </div>
-            </div>
-          </div>
+          </dl>
         </div>
       </div>
 
@@ -343,19 +246,10 @@ export default function UserProfileForm({
         <button
           type="button"
           onClick={onCancel}
-          title="Đóng"
-          aria-label="Đóng"
-          className="h-10 px-4 inline-flex items-center justify-center rounded-xl border border-gray-200 text-gray-600 hover:text-rms-burgundy hover:bg-gray-50 hover:border-rms-burgundy/30 transition-colors shrink-0"
+          aria-label="Đóng cửa sổ hồ sơ"
+          className="h-9 px-4 inline-flex items-center justify-center rounded-xl border border-gray-200 text-gray-600 hover:text-rms-burgundy hover:bg-gray-50 transition-colors text-xs sm:text-sm font-medium cursor-pointer"
         >
-          <span className="font-medium text-sm">Đóng</span>
-        </button>
-        <button
-          type="button"
-          onClick={() => setIsEditing(true)}
-          className="h-10 px-4 inline-flex items-center justify-center gap-2 rounded-xl bg-rms-gradient text-white font-medium text-sm shadow-sm hover:shadow transition-all duration-200 hover:-translate-y-0.5 shrink-0"
-        >
-          <PencilSquareIcon className="w-4 h-4" />
-          <span>Chỉnh sửa hồ sơ</span>
+          Đóng
         </button>
       </div>
     </div>

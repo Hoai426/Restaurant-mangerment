@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState } from "react";
-import * as XLSX from "xlsx";
 import { ArrowDownTrayIcon } from "@heroicons/react/24/outline";
 import { IconSpinner } from "@/components/common/IconSpinner";
 import type { RevenueSummary, RevenueTimelinePoint, ReportGroupBy } from "@/types/report";
@@ -27,11 +26,14 @@ export function ExportExcelButton({
   const hasData = timeline.length > 0 && Boolean(summary);
   const isDisabled = disabled || !hasData || isExporting;
 
-  const handleExport = () => {
+  const handleExport = async () => {
     if (!hasData || !summary) return;
 
     try {
       setIsExporting(true);
+
+      // Dynamic import to avoid loading heavy xlsx library in initial client bundle
+      const XLSX = await import("xlsx");
 
       // 1. Tạo các hàng dữ liệu chi tiết
       const rows = timeline.map((item) => ({
@@ -84,6 +86,7 @@ export function ExportExcelButton({
       type="button"
       onClick={handleExport}
       disabled={isDisabled}
+      aria-label={`Xuất file Excel báo cáo từ ${startDate} đến ${endDate}`}
       title={
         !hasData
           ? "Không có dữ liệu để xuất Excel"

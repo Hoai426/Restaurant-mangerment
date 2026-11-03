@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useMemo } from "react";
 import {
   BuildingOffice2Icon,
   PlusIcon,
@@ -12,6 +12,7 @@ import { AsyncStateView } from "@/components/common/AsyncStateView";
 import { getAccessToken } from "@/utils/cookie";
 import { getRoleFromToken } from "@/utils/auth";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
+import { useDebounce } from "@/hooks/useDebounce";
 import type { Room, SearchRequest, FilterCriteria } from "@/types/room";
 import {
   useRooms,
@@ -42,16 +43,8 @@ export default function RoomsPage() {
 
   // Search & Filter state (RM-91)
   const [searchQuery, setSearchQuery] = useState("");
-  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
+  const debouncedSearchQuery = useDebounce(searchQuery, 350);
   const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
-
-  // 350ms debounce for search query
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedSearchQuery(searchQuery);
-    }, 350);
-    return () => clearTimeout(timer);
-  }, [searchQuery]);
 
   const token = getAccessToken();
   const role = token ? getRoleFromToken(token) : null;

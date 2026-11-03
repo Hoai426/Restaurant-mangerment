@@ -185,7 +185,11 @@ export function RevenueCharts({
   const showStaticDots = timeline.length <= 14;
 
   return (
-    <div className="px-2 sm:px-4 pb-3 sm:pb-4">
+    <div
+      className="px-2 sm:px-4 pb-3 sm:pb-4"
+      role="region"
+      aria-label="Biểu đồ phân tích doanh thu và số đơn hàng theo thời gian"
+    >
       {/* Chiều cao giảm 20-25%: h-[250px] sm:h-[280px] */}
       <div className="w-full h-[220px] sm:h-[240px] xl:h-[210px] 2xl:h-[190px]">
         <ResponsiveContainer width="100%" height="100%">

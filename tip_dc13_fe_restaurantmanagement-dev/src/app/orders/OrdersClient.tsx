@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 import {
   PlusIcon,
   ArrowPathIcon,
 } from "@heroicons/react/24/outline";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
+import { useDebounce } from "@/hooks/useDebounce";
 import {
   CreateOrderModal,
   UpdateOrderModal,
@@ -54,13 +55,22 @@ export default function OrdersClient() {
   const [pageSize, setPageSize] = useState<number>(10);
 
   // 3. React Query Hooks
+  const debouncedOrderCode = useDebounce(filters.orderCode, 350);
+  const activeFilters = useMemo(
+    () => ({
+      ...filters,
+      orderCode: debouncedOrderCode,
+    }),
+    [filters, debouncedOrderCode]
+  );
+
   const {
     data: ordersPage,
     isLoading,
     isError,
     error: queryError,
     refetch,
-  } = useOrders(filters, page, pageSize);
+  } = useOrders(activeFilters, page, pageSize);
 
   const {
     mutate: updateStatusMutation,

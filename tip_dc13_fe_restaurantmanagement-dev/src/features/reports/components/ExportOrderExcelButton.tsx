@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState } from "react";
-import * as XLSX from "xlsx";
 import { ArrowDownTrayIcon } from "@heroicons/react/24/outline";
 import { IconSpinner } from "@/components/common/IconSpinner";
 import {
@@ -57,12 +56,13 @@ export function ExportOrderExcelButton({
       ? "Phạm vi: cả 4 trạng thái. Tổng giá trị bao gồm cả đơn đang chờ xử lý và đã xác nhận; không phải doanh thu đã thu."
       : `Phạm vi: chỉ đơn ${formatOrderStatusLabelLower(statusFilter)}.`;
 
-  const handleExport = () => {
+  const handleExport = async () => {
     if (!data) return;
 
     try {
       setIsExporting(true);
       setExportFeedback(null);
+      const XLSX = await import("xlsx");
       const workbook = XLSX.utils.book_new();
 
       // Sheet 1: Thống kê theo Trạng thái

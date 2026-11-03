@@ -37,6 +37,13 @@
   --color-rms-cream: var(--rms-cream);
   --color-rms-charcoal: var(--rms-charcoal);
   --color-rms-charcoal-soft: var(--rms-charcoal-soft);
+  --color-primary: var(--rms-burgundy);
+  --color-primary-dark: var(--rms-burgundy-dark);
+  --color-primary-light: var(--rms-burgundy-light);
+  --color-accent: var(--rms-gold);
+  --color-accent-light: var(--rms-gold-light);
+  --color-destructive: var(--rms-error);
+  --color-success: var(--rms-success);
   --font-sans: var(--font-inter);
   --font-mono: var(--font-geist-mono);
 }
@@ -1016,5 +1023,15 @@ body {
     flex: 0 0 2.5rem !important;
     font-size: 1.25rem !important;
     border-radius: 0.5rem !important;
+  }
+}
+
+/* Accessibility: Respect prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }

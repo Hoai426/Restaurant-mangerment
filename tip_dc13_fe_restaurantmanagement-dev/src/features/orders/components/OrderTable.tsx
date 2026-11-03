@@ -15,6 +15,9 @@ import {
   InboxIcon,
   LockClosedIcon,
   BanknotesIcon,
+  ClockIcon,
+  UserGroupIcon,
+  TableCellsIcon,
 } from "@heroicons/react/24/outline";
 
 export interface OrderTableProps {
@@ -42,7 +45,8 @@ export function OrderTable({
 }: OrderTableProps) {
   return (
     <div className="bg-white rounded-2xl border border-gray-100 shadow-xs overflow-hidden">
-      <div className="overflow-x-auto">
+      {/* ─── DESKTOP TABLE VIEW (md:block) ─── */}
+      <div className="hidden md:block overflow-x-auto">
         <table className="w-full text-left border-collapse text-xs">
           <thead className="bg-gray-50/80 text-gray-500 border-b border-gray-100 font-semibold tracking-wider uppercase text-[11px]">
             <tr>
@@ -56,37 +60,34 @@ export function OrderTable({
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100 text-gray-700">
-            {/* Loading Skeleton State */}
-            {isLoading && (
-              <>
-                {Array.from({ length: 5 }).map((_, idx) => (
-                  <tr key={`skeleton-${idx}`} className="animate-pulse">
-                    <td className="py-3.5 px-4">
-                      <div className="h-4 bg-gray-200 rounded-md w-28 mb-1"></div>
-                      <div className="h-3 bg-gray-100 rounded-md w-16"></div>
-                    </td>
-                    <td className="py-3.5 px-4">
-                      <div className="h-4 bg-gray-200 rounded-md w-20"></div>
-                    </td>
-                    <td className="py-3.5 px-4">
-                      <div className="h-4 bg-gray-200 rounded-md w-24"></div>
-                    </td>
-                    <td className="py-3.5 px-4">
-                      <div className="h-4 bg-gray-200 rounded-md w-28"></div>
-                    </td>
-                    <td className="py-3.5 px-4 text-right">
-                      <div className="h-4 bg-gray-200 rounded-md w-20 ml-auto"></div>
-                    </td>
-                    <td className="py-3.5 px-4 text-center">
-                      <div className="h-5 bg-gray-200 rounded-full w-20 mx-auto"></div>
-                    </td>
-                    <td className="py-3.5 px-4 text-right">
-                      <div className="h-6 bg-gray-200 rounded-md w-24 ml-auto"></div>
-                    </td>
-                  </tr>
-                ))}
-              </>
-            )}
+            {/* Loading Skeleton */}
+            {isLoading &&
+              Array.from({ length: 5 }).map((_, idx) => (
+                <tr key={`skeleton-${idx}`} className="animate-pulse">
+                  <td className="py-3.5 px-4">
+                    <div className="h-4 bg-gray-200 rounded-md w-28 mb-1"></div>
+                    <div className="h-3 bg-gray-100 rounded-md w-16"></div>
+                  </td>
+                  <td className="py-3.5 px-4">
+                    <div className="h-4 bg-gray-200 rounded-md w-20"></div>
+                  </td>
+                  <td className="py-3.5 px-4">
+                    <div className="h-4 bg-gray-200 rounded-md w-24"></div>
+                  </td>
+                  <td className="py-3.5 px-4">
+                    <div className="h-4 bg-gray-200 rounded-md w-28"></div>
+                  </td>
+                  <td className="py-3.5 px-4 text-right">
+                    <div className="h-4 bg-gray-200 rounded-md w-20 ml-auto"></div>
+                  </td>
+                  <td className="py-3.5 px-4 text-center">
+                    <div className="h-5 bg-gray-200 rounded-full w-20 mx-auto"></div>
+                  </td>
+                  <td className="py-3.5 px-4 text-right">
+                    <div className="h-6 bg-gray-200 rounded-md w-24 ml-auto"></div>
+                  </td>
+                </tr>
+              ))}
 
             {/* Empty State */}
             {!isLoading && orders.length === 0 && (
@@ -113,15 +114,17 @@ export function OrderTable({
                 const isRowUpdating = updatingOrderId === order.id;
 
                 return (
-                  <tr
-                    key={order.id}
-                    className="hover:bg-gray-50/70 transition-colors group"
-                  >
+                  <tr key={order.id} className="hover:bg-gray-50/70 transition-colors group">
                     {/* Cột 1: Mã đơn hàng */}
                     <td className="py-3.5 px-4 align-middle">
-                      <div className="font-mono font-bold text-gray-900 group-hover:text-rms-burgundy transition-colors">
+                      <button
+                        type="button"
+                        onClick={() => onViewDetail(order.id)}
+                        className="font-mono font-bold text-gray-900 group-hover:text-rms-burgundy transition-colors text-left cursor-pointer focus:outline-hidden focus-visible:underline"
+                        aria-label={`Xem chi tiết đơn ${order.orderCode}`}
+                      >
                         {order.orderCode}
-                      </div>
+                      </button>
                       {order.note && (
                         <div className="text-[11px] text-gray-400 italic truncate max-w-xs" title={order.note}>
                           {order.note}
@@ -135,9 +138,7 @@ export function OrderTable({
                         {order.tableNumber || `Bàn #${order.tableId}`}
                       </div>
                       {order.roomName && (
-                        <div className="text-[11px] text-gray-400">
-                          {order.roomName}
-                        </div>
+                        <div className="text-[11px] text-gray-400">{order.roomName}</div>
                       )}
                     </td>
 
@@ -164,44 +165,44 @@ export function OrderTable({
                     {/* Cột 6: Trạng thái */}
                     <td className="py-3.5 px-4 align-middle text-center">
                       {statusConfig && (
-                        <Badge variant={statusConfig.variant}>
-                          {statusConfig.label}
-                        </Badge>
+                        <Badge variant={statusConfig.variant}>{statusConfig.label}</Badge>
                       )}
                     </td>
 
                     {/* Cột 7: Thao tác */}
                     <td className="py-3.5 px-4 align-middle text-right">
-                      <div className="inline-flex items-center justify-end gap-1.5 flex-wrap">
-                        {/* 1. Nút Xem chi tiết (Luôn hiển thị) */}
+                      <div className="inline-flex items-center justify-end gap-1 flex-wrap">
+                        {/* 1. Nút Xem chi tiết */}
                         <button
                           type="button"
                           onClick={() => onViewDetail(order.id)}
-                          className="p-1.5 text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer"
+                          className="p-2 min-w-[34px] min-h-[34px] flex items-center justify-center text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer focus:outline-hidden focus-visible:ring-2 focus-visible:ring-rms-gold/50"
                           title="Xem chi tiết đơn hàng"
+                          aria-label={`Xem chi tiết đơn ${order.orderCode}`}
                         >
                           <EyeIcon className="w-4 h-4" />
                         </button>
 
-                        {/* 2. Nút Sửa (Chỉ hiển thị khi đơn PENDING hoặc CONFIRMED) */}
+                        {/* 2. Nút Sửa */}
                         {isEditable && (
                           <button
                             type="button"
                             onClick={() => onEditOrder(order)}
-                            className="p-1.5 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-colors cursor-pointer"
+                            className="p-2 min-w-[34px] min-h-[34px] flex items-center justify-center text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-colors cursor-pointer focus:outline-hidden focus-visible:ring-2 focus-visible:ring-blue-400"
                             title="Chỉnh sửa đơn hàng"
+                            aria-label={`Chỉnh sửa đơn ${order.orderCode}`}
                           >
                             <PencilSquareIcon className="w-4 h-4" />
                           </button>
                         )}
 
-                        {/* 2.1. Nút Tạo thanh toán (Chỉ hiển thị khi đơn PENDING hoặc CONFIRMED) */}
+                        {/* 2.1. Nút Thanh toán */}
                         {isEditable && onPaymentOrder && (
                           <button
                             type="button"
                             disabled={isRowUpdating || createdPaymentOrderIds?.has(order.id)}
                             onClick={() => onPaymentOrder(order)}
-                            className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
+                            className={`p-2 min-w-[34px] min-h-[34px] flex items-center justify-center rounded-lg transition-colors cursor-pointer focus:outline-hidden focus-visible:ring-2 focus-visible:ring-emerald-400 ${
                               createdPaymentOrderIds?.has(order.id)
                                 ? "text-gray-300 bg-gray-50 cursor-not-allowed"
                                 : "text-emerald-600 hover:text-emerald-800 hover:bg-emerald-50"
@@ -211,53 +212,57 @@ export function OrderTable({
                                 ? "Đơn hàng đã được tạo thanh toán trong phiên này"
                                 : "Thanh toán đơn hàng"
                             }
+                            aria-label={`Thanh toán đơn ${order.orderCode}`}
                           >
                             <BanknotesIcon className="w-4 h-4" />
                           </button>
                         )}
 
-                        {/* 3. Nút Xác nhận đơn (PENDING -> CONFIRMED) */}
+                        {/* 3. Nút Xác nhận đơn */}
                         {order.status === "PENDING" && (
                           <button
                             type="button"
                             disabled={isRowUpdating}
                             onClick={() => onUpdateStatus(order.id, "CONFIRMED")}
-                            className="inline-flex items-center gap-1 px-2.5 py-1 text-[11px] font-semibold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-lg transition-colors cursor-pointer disabled:opacity-50"
+                            className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-semibold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-lg transition-colors cursor-pointer disabled:opacity-50 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-emerald-500"
                             title="Xác nhận đơn hàng"
+                            aria-label={`Xác nhận đơn ${order.orderCode}`}
                           >
                             {isRowUpdating ? <IconSpinner /> : <CheckIcon className="w-3.5 h-3.5" />}
                             <span>Xác nhận</span>
                           </button>
                         )}
 
-                        {/* 4. Nút Hoàn tất đơn (CONFIRMED -> COMPLETED) */}
+                        {/* 4. Nút Hoàn tất đơn */}
                         {order.status === "CONFIRMED" && (
                           <button
                             type="button"
                             disabled={isRowUpdating}
                             onClick={() => onUpdateStatus(order.id, "COMPLETED")}
-                            className="inline-flex items-center gap-1 px-2.5 py-1 text-[11px] font-semibold text-blue-700 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-lg transition-colors cursor-pointer disabled:opacity-50"
+                            className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-semibold text-blue-700 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-lg transition-colors cursor-pointer disabled:opacity-50 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-blue-500"
                             title="Hoàn tất đơn hàng"
+                            aria-label={`Hoàn tất đơn ${order.orderCode}`}
                           >
                             {isRowUpdating ? <IconSpinner /> : <CheckCircleIcon className="w-3.5 h-3.5" />}
                             <span>Hoàn tất</span>
                           </button>
                         )}
 
-                        {/* 5. Nút Hủy đơn (PENDING hoặc CONFIRMED) */}
+                        {/* 5. Nút Hủy đơn */}
                         {isEditable && (
                           <button
                             type="button"
                             disabled={isRowUpdating}
                             onClick={() => onRequestCancel(order)}
-                            className="p-1.5 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors cursor-pointer disabled:opacity-50"
+                            className="p-2 min-w-[34px] min-h-[34px] flex items-center justify-center text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors cursor-pointer disabled:opacity-50 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-red-400"
                             title="Hủy đơn hàng"
+                            aria-label={`Hủy đơn ${order.orderCode}`}
                           >
                             <XMarkIcon className="w-4 h-4" />
                           </button>
                         )}
 
-                        {/* 6. Trạng thái đóng (COMPLETED hoặc CANCELLED) */}
+                        {/* 6. Trạng thái đóng */}
                         {!isEditable && (
                           <span className="inline-flex items-center gap-1 text-[11px] text-gray-400 italic px-1">
                             <LockClosedIcon className="w-3 h-3" />
@@ -271,6 +276,133 @@ export function OrderTable({
               })}
           </tbody>
         </table>
+      </div>
+
+      {/* ─── MOBILE CARD VIEW (md:hidden) ─── */}
+      <div className="md:hidden divide-y divide-gray-100">
+        {isLoading &&
+          Array.from({ length: 4 }).map((_, idx) => (
+            <div key={`mobile-skeleton-${idx}`} className="p-4 space-y-3 animate-pulse">
+              <div className="flex justify-between items-center">
+                <div className="h-4 bg-gray-200 rounded w-28"></div>
+                <div className="h-5 bg-gray-200 rounded-full w-20"></div>
+              </div>
+              <div className="h-3 bg-gray-100 rounded w-40"></div>
+              <div className="h-4 bg-gray-200 rounded w-24"></div>
+            </div>
+          ))}
+
+        {!isLoading && orders.length === 0 && (
+          <div className="py-12 px-4 text-center text-gray-400">
+            <InboxIcon className="w-8 h-8 mx-auto text-gray-300 mb-2" />
+            <p className="text-sm font-semibold text-gray-600">Không tìm thấy đơn hàng</p>
+          </div>
+        )}
+
+        {!isLoading &&
+          orders.map((order) => {
+            const statusConfig = ORDER_STATUS_CONFIG[order.status];
+            const isEditable = isOrderEditable(order.status);
+            const isRowUpdating = updatingOrderId === order.id;
+
+            return (
+              <div key={`mobile-${order.id}`} className="p-4 space-y-3 hover:bg-gray-50/50 transition-colors">
+                <div className="flex items-start justify-between gap-2">
+                  <div>
+                    <span className="font-mono font-bold text-gray-900 text-sm">
+                      {order.orderCode}
+                    </span>
+                    <div className="flex items-center gap-2 mt-1 text-xs text-gray-500">
+                      <TableCellsIcon className="w-3.5 h-3.5 text-gray-400" />
+                      <span>{order.tableNumber || `Bàn #${order.tableId}`} {order.roomName ? `(${order.roomName})` : ""}</span>
+                    </div>
+                  </div>
+                  {statusConfig && <Badge variant={statusConfig.variant}>{statusConfig.label}</Badge>}
+                </div>
+
+                <div className="flex items-center justify-between text-xs text-gray-600 pt-1 border-t border-gray-50">
+                  <div className="flex items-center gap-3">
+                    <span className="flex items-center gap-1">
+                      <UserGroupIcon className="w-3.5 h-3.5 text-gray-400" />
+                      {order.numberOfGuests ?? 0} khách
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <ClockIcon className="w-3.5 h-3.5 text-gray-400" />
+                      {formatDateTime(order.createdAt)}
+                    </span>
+                  </div>
+                  <span className="font-mono font-bold text-rms-burgundy text-sm">
+                    {formatCurrency(order.totalAmount)}
+                  </span>
+                </div>
+
+                {/* Mobile Actions */}
+                <div className="flex items-center justify-end gap-2 pt-2 border-t border-gray-100 flex-wrap">
+                  <button
+                    type="button"
+                    onClick={() => onViewDetail(order.id)}
+                    className="px-3 py-1.5 text-xs font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors cursor-pointer"
+                  >
+                    Chi tiết
+                  </button>
+
+                  {isEditable && (
+                    <button
+                      type="button"
+                      onClick={() => onEditOrder(order)}
+                      className="px-3 py-1.5 text-xs font-medium text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors cursor-pointer"
+                    >
+                      Sửa
+                    </button>
+                  )}
+
+                  {isEditable && onPaymentOrder && (
+                    <button
+                      type="button"
+                      disabled={isRowUpdating || createdPaymentOrderIds?.has(order.id)}
+                      onClick={() => onPaymentOrder(order)}
+                      className="px-3 py-1.5 text-xs font-semibold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded-lg transition-colors cursor-pointer disabled:opacity-50"
+                    >
+                      Thanh toán
+                    </button>
+                  )}
+
+                  {order.status === "PENDING" && (
+                    <button
+                      type="button"
+                      disabled={isRowUpdating}
+                      onClick={() => onUpdateStatus(order.id, "CONFIRMED")}
+                      className="px-3 py-1.5 text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg transition-colors cursor-pointer disabled:opacity-50"
+                    >
+                      {isRowUpdating ? <IconSpinner /> : "Xác nhận"}
+                    </button>
+                  )}
+
+                  {order.status === "CONFIRMED" && (
+                    <button
+                      type="button"
+                      disabled={isRowUpdating}
+                      onClick={() => onUpdateStatus(order.id, "COMPLETED")}
+                      className="px-3 py-1.5 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors cursor-pointer disabled:opacity-50"
+                    >
+                      {isRowUpdating ? <IconSpinner /> : "Hoàn tất"}
+                    </button>
+                  )}
+
+                  {isEditable && (
+                    <button
+                      type="button"
+                      disabled={isRowUpdating}
+                      onClick={() => onRequestCancel(order)}
+                      className="px-2.5 py-1.5 text-xs font-medium text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer disabled:opacity-50"
+                    >
+                      Hủy
+                    </button>
+                  )}
+                </div>
+              </div>
+            );
+          })}
       </div>
     </div>
   );

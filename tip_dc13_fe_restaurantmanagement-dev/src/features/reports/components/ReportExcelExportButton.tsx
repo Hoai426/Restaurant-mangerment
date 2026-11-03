@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState } from "react";
-import * as XLSX from "xlsx";
 import { ArrowDownTrayIcon } from "@heroicons/react/24/outline";
 import { IconSpinner } from "@/components/common/IconSpinner";
 
@@ -29,13 +28,14 @@ export function ReportExcelExportButton({
   const [isExporting, setIsExporting] = useState(false);
   const [exportFeedback, setExportFeedback] = useState<"success" | "error" | null>(null);
 
-  const handleExport = () => {
+  const handleExport = async () => {
     if (disabled || isExporting || sheets.length === 0) return;
 
     try {
       setIsExporting(true);
       setExportFeedback(null);
 
+      const XLSX = await import("xlsx");
       const workbook = XLSX.utils.book_new();
       sheets.forEach((sheet) => {
         const worksheet = XLSX.utils.json_to_sheet(sheet.rows);

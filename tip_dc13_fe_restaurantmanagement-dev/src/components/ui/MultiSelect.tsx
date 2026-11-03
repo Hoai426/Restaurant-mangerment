@@ -44,14 +44,19 @@ export function MultiSelect<T extends string | number>({
 }: MultiSelectProps<T>) {
   const [isOpen, setIsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [highlightedIndex, setHighlightedIndex] = useState(-1);
   const containerRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const listboxRef = useRef<HTMLUListElement>(null);
 
   const listboxId = id ? `${id}-listbox` : "multiselect-listbox";
 
   const closeDropdown = () => {
     setIsOpen(false);
     setSearchQuery("");
+    setHighlightedIndex(-1);
+    triggerRef.current?.focus();
   };
 
   const toggleDropdown = () => {
@@ -59,6 +64,7 @@ export function MultiSelect<T extends string | number>({
     setIsOpen((prev) => {
       if (prev) {
         setSearchQuery("");
+        setHighlightedIndex(-1);
       }
       return !prev;
     });
@@ -71,20 +77,13 @@ export function MultiSelect<T extends string | number>({
         containerRef.current &&
         !containerRef.current.contains(event.target as Node)
       ) {
-        closeDropdown();
-      }
-    }
-    function handleKeyDown(event: KeyboardEvent) {
-      if (event.key === "Escape") {
-        closeDropdown();
+        setIsOpen(false);
+        setSearchQuery("");
+        setHighlightedIndex(-1);
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
-    document.addEventListener("keydown", handleKeyDown);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-      document.removeEventListener("keydown", handleKeyDown);
-    };
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   // Focus search input when opened
@@ -117,10 +116,51 @@ export function MultiSelect<T extends string | number>({
     opt.label.toLowerCase().includes(searchQuery.toLowerCase().trim())
   );
 
+  // Scroll highlighted item into view
+  useEffect(() => {
+    if (isOpen && highlightedIndex >= 0 && listboxRef.current) {
+      const item = listboxRef.current.children[highlightedIndex] as HTMLElement | undefined;
+      item?.scrollIntoView({ block: "nearest" });
+    }
+  }, [isOpen, highlightedIndex]);
+
+  const handleSearchKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (filteredOptions.length === 0) {
+      if (e.key === "Escape") closeDropdown();
+      return;
+    }
+
+    switch (e.key) {
+      case "ArrowDown":
+        e.preventDefault();
+        setHighlightedIndex((prev) =>
+          prev < filteredOptions.length - 1 ? prev + 1 : 0
+        );
+        break;
+      case "ArrowUp":
+        e.preventDefault();
+        setHighlightedIndex((prev) =>
+          prev > 0 ? prev - 1 : filteredOptions.length - 1
+        );
+        break;
+      case "Enter":
+        e.preventDefault();
+        if (highlightedIndex >= 0 && filteredOptions[highlightedIndex]) {
+          handleToggle(filteredOptions[highlightedIndex].value);
+        }
+        break;
+      case "Escape":
+        e.preventDefault();
+        closeDropdown();
+        break;
+    }
+  };
+
   return (
     <div ref={containerRef} className={`relative w-full ${className}`}>
       {/* Trigger Box */}
       <div
+        ref={triggerRef}
         id={id}
         tabIndex={disabled ? -1 : 0}
         role="combobox"
@@ -134,6 +174,9 @@ export function MultiSelect<T extends string | number>({
           if (e.key === "Enter" || e.key === " ") {
             e.preventDefault();
             toggleDropdown();
+          } else if (e.key === "Escape" && isOpen) {
+            e.preventDefault();
+            closeDropdown();
           }
         }}
         className={`min-h-[46px] w-full px-3 py-2 bg-white border rounded-xl flex items-center justify-between gap-2 cursor-pointer transition-all duration-200 ${
@@ -155,7 +198,7 @@ export function MultiSelect<T extends string | number>({
             selectedOptions.map((opt) => (
               <span
                 key={String(opt.value)}
-                className="inline-flex items-center gap-1 pl-2.5 pr-1.5 py-0.5 rounded-lg text-xs font-semibold bg-rms-burgundy/10 text-rms-burgundy border border-rms-burgundy/20 max-w-[200px]"
+                className="inline-flex items-center gap-1 pl-2.5 pr-1 py-1 rounded-lg text-xs font-semibold bg-rms-burgundy/10 text-rms-burgundy border border-rms-burgundy/20 max-w-[200px]"
                 title={opt.label}
               >
                 <span className="truncate">{opt.label}</span>
@@ -163,7 +206,7 @@ export function MultiSelect<T extends string | number>({
                   type="button"
                   disabled={disabled}
                   onClick={(e) => handleRemove(e, opt.value)}
-                  className="p-0.5 hover:bg-rms-burgundy/20 rounded-md text-rms-burgundy transition-colors cursor-pointer"
+                  className="p-1 hover:bg-rms-burgundy/20 rounded-md text-rms-burgundy transition-colors cursor-pointer min-w-[20px] min-h-[20px] flex items-center justify-center"
                   aria-label={`Xóa ${opt.label}`}
                 >
                   <XMarkIcon className="w-3.5 h-3.5" />
@@ -195,9 +238,13 @@ export function MultiSelect<T extends string | number>({
                 ref={searchInputRef}
                 type="text"
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={(e) => {
+                  setSearchQuery(e.target.value);
+                  setHighlightedIndex(0);
+                }}
+                onKeyDown={handleSearchKeyDown}
                 placeholder={searchPlaceholder}
-                className="w-full pl-8 pr-3 py-1.5 text-xs sm:text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:border-rms-burgundy focus:ring-1 focus:ring-rms-burgundy/20 text-gray-800 placeholder-gray-400"
+                className="w-full pl-8 pr-3 py-1.5 text-xs sm:text-sm bg-white border border-gray-200 rounded-lg focus:outline-hidden focus:border-rms-burgundy focus:ring-1 focus:ring-rms-burgundy/20 text-gray-800 placeholder-gray-400"
                 onClick={(e) => e.stopPropagation()}
               />
             </div>
@@ -205,6 +252,7 @@ export function MultiSelect<T extends string | number>({
 
           {/* Options List */}
           <ul
+            ref={listboxRef}
             id={listboxId}
             role="listbox"
             aria-multiselectable="true"
@@ -215,18 +263,22 @@ export function MultiSelect<T extends string | number>({
                 {emptySearchMessage}
               </li>
             ) : (
-              filteredOptions.map((opt) => {
+              filteredOptions.map((opt, idx) => {
                 const isSelected = selectedValues.includes(opt.value);
+                const isHighlighted = idx === highlightedIndex;
                 return (
                   <li
                     key={String(opt.value)}
                     role="option"
                     aria-selected={isSelected}
                     onClick={() => handleToggle(opt.value)}
-                    className={`px-3 py-2 flex items-center justify-between gap-2 cursor-pointer transition-colors ${
-                      isSelected
+                    onMouseEnter={() => setHighlightedIndex(idx)}
+                    className={`px-3 py-2.5 flex items-center justify-between gap-2 cursor-pointer transition-colors ${
+                      isHighlighted
+                        ? "bg-red-50/70 text-rms-burgundy"
+                        : isSelected
                         ? "bg-rms-burgundy/5 text-rms-burgundy font-medium"
-                        : "text-gray-700 hover:bg-gray-50 hover:text-rms-burgundy"
+                        : "text-gray-700 hover:bg-gray-50"
                     }`}
                   >
                     <div className="flex items-center gap-2.5 min-w-0">

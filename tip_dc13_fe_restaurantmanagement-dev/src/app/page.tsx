@@ -1,33 +1,61 @@
 import Link from "next/link";
-import { BuildingStorefrontIcon } from "@heroicons/react/24/outline";
+import {
+  BuildingStorefrontIcon,
+  SparklesIcon,
+  BookOpenIcon,
+  ArrowRightIcon,
+} from "@heroicons/react/24/outline";
 
 export default function Home() {
   return (
-    <main className="flex min-h-screen items-center justify-center bg-slate-900 px-4 text-white">
-      <div className="max-w-md w-full rounded-2xl bg-slate-800/80 backdrop-blur border border-slate-700/60 p-8 text-center shadow-2xl">
-        <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-amber-500/10 text-amber-400 border border-amber-500/20">
-          <BuildingStorefrontIcon className="w-8 h-8" strokeWidth={1.8} />
+    <main className="flex min-h-screen items-center justify-center bg-radial from-[#FFFDF9] via-[#F8F5EF] to-[#EDE7DB] px-4 py-8 text-rms-charcoal">
+      <div className="max-w-lg w-full rounded-3xl bg-white/90 backdrop-blur-md border border-[#E2D9CC] p-8 sm:p-10 text-center shadow-xl shadow-rms-burgundy/5 animate-fade-in-up">
+        {/* Brand Badge */}
+        <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-rms-burgundy text-white shadow-lg shadow-rms-burgundy/20">
+          <BuildingStorefrontIcon className="w-9 h-9 text-rms-gold" strokeWidth={1.8} />
         </div>
-        <h1 className="text-2xl font-bold tracking-tight text-white">
+
+        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-rms-gold/10 text-rms-gold text-xs font-bold tracking-wider uppercase mb-3 border border-rms-gold/20">
+          <SparklesIcon className="w-3.5 h-3.5" />
+          <span>Hệ Thống Nhà Hàng Cao Cấp</span>
+        </div>
+
+        <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-rms-charcoal">
           Restaurant Management
         </h1>
-        <p className="mt-2 text-sm text-slate-400">
-          Hệ thống quản lý nhà hàng thông minh & vận hành hiệu quả
+        <p className="mt-2.5 text-sm sm:text-base text-rms-text-secondary max-w-sm mx-auto leading-relaxed">
+          Giải pháp quản lý bàn ăn, thực đơn, đơn hàng và doanh thu vận hành chuẩn xác, tinh tế.
         </p>
 
         <div className="mt-8 flex flex-col gap-3">
           <Link
             href="/login"
-            className="flex w-full items-center justify-center rounded-xl bg-amber-600 px-4 py-3 font-semibold text-white transition hover:bg-amber-500 shadow-lg shadow-amber-900/30"
+            className="group flex w-full items-center justify-center gap-2 rounded-xl bg-rms-gradient px-5 py-3.5 font-semibold text-white transition-all duration-200 hover:shadow-lg hover:shadow-rms-burgundy/25 hover:-translate-y-0.5 cursor-pointer text-sm"
           >
-            Đăng nhập hệ thống
+            <span>Đăng nhập hệ thống</span>
+            <ArrowRightIcon className="w-4 h-4 transition-transform group-hover:translate-x-1" />
           </Link>
-          <Link
-            href="/register"
-            className="flex w-full items-center justify-center rounded-xl bg-slate-700/80 px-4 py-3 font-medium text-slate-200 transition hover:bg-slate-700 border border-slate-600"
-          >
-            Đăng ký tài khoản
-          </Link>
+
+          <div className="grid grid-cols-2 gap-3 pt-1">
+            <Link
+              href="/menu"
+              className="flex items-center justify-center gap-1.5 rounded-xl bg-rms-cream hover:bg-[#F0EAE0] px-4 py-3 font-semibold text-rms-charcoal border border-rms-border transition-colors text-sm cursor-pointer"
+            >
+              <BookOpenIcon className="w-4 h-4 text-rms-gold" />
+              <span>Xem thực đơn</span>
+            </Link>
+
+            <Link
+              href="/register"
+              className="flex items-center justify-center rounded-xl bg-white hover:bg-gray-50 px-4 py-3 font-semibold text-rms-text-secondary border border-gray-200 transition-colors text-sm cursor-pointer"
+            >
+              <span>Đăng ký mới</span>
+            </Link>
+          </div>
+        </div>
+
+        <div className="mt-8 pt-6 border-t border-gray-100 flex items-center justify-center gap-2 text-xs text-rms-text-muted">
+          <span>&copy; {new Date().getFullYear()} Restaurant Management System</span>
         </div>
       </div>
     </main>

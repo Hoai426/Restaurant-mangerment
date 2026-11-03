@@ -41,7 +41,7 @@ export function DishTable({
             <th className="w-32">Đơn giá</th>
             <th className="w-32 text-center">Trạng thái</th>
             <th className="w-32">Ngày tạo</th>
-            <th className="w-24 text-center">Thao tác</th>
+            <th className="w-28 text-center">Thao tác</th>
           </tr>
         </thead>
 
@@ -56,16 +56,7 @@ export function DishTable({
             dishes.map((dish) => (
               <tr
                 key={dish.id}
-                onClick={() => onViewDetail(dish)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                    e.preventDefault();
-                    onViewDetail(dish);
-                  }
-                }}
-                tabIndex={0}
-                role="button"
-                className="cursor-pointer transition-colors hover:bg-gray-50/80 group focus:outline-none focus:bg-gray-50"
+                className="transition-colors hover:bg-gray-50/80 group"
               >
                 {/* ID */}
                 <td className="font-mono text-xs font-semibold text-gray-400">
@@ -73,21 +64,31 @@ export function DishTable({
                 </td>
 
                 {/* Thumbnail */}
-                <td className="text-center" onClick={(e) => e.stopPropagation()}>
+                <td className="text-center">
                   <div className="flex justify-center">
-                    <Thumbnail src={dish.imageUrl} alt={dish.name} size="md" />
+                    <button
+                      type="button"
+                      onClick={() => onViewDetail(dish)}
+                      className="cursor-pointer focus:outline-hidden focus-visible:ring-2 focus-visible:ring-rms-gold/50 rounded-xl"
+                      aria-label={`Xem ảnh và chi tiết món ${dish.name}`}
+                    >
+                      <Thumbnail src={dish.imageUrl} alt={dish.name} size="md" />
+                    </button>
                   </div>
                 </td>
 
                 {/* Name & Short description */}
                 <td className="max-w-xs">
                   <div className="flex flex-col">
-                    <span
-                      className="font-bold text-rms-charcoal text-sm group-hover:text-rms-burgundy transition-colors line-clamp-2"
+                    <button
+                      type="button"
+                      onClick={() => onViewDetail(dish)}
+                      className="text-left font-bold text-rms-charcoal text-sm group-hover:text-rms-burgundy transition-colors line-clamp-2 cursor-pointer focus:outline-hidden focus-visible:underline"
                       title={dish.name}
+                      aria-label={`Xem chi tiết món ${dish.name}`}
                     >
                       {dish.name}
-                    </span>
+                    </button>
                     <span
                       className="text-xs text-gray-400 line-clamp-2 max-w-xs mt-0.5"
                       title={dish.description?.trim() ? dish.description : undefined}
@@ -127,27 +128,24 @@ export function DishTable({
                 </td>
 
                 {/* Actions */}
-                <td
-                  className="text-center"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <div className="flex items-center justify-center gap-1">
+                <td className="text-center">
+                  <div className="flex items-center justify-center gap-1.5">
                     {onEdit && (
                       <button
                         type="button"
                         onClick={() => onEdit(dish)}
-                        className="p-1.5 rounded-lg text-gray-400 hover:text-rms-burgundy hover:bg-rms-burgundy/5 transition-colors cursor-pointer"
+                        className="p-2 min-w-[36px] min-h-[36px] flex items-center justify-center rounded-xl text-gray-400 hover:text-rms-burgundy hover:bg-rms-burgundy/5 transition-colors cursor-pointer focus:outline-hidden focus-visible:ring-2 focus-visible:ring-rms-burgundy/40"
                         title="Chỉnh sửa món ăn"
                         aria-label={`Chỉnh sửa món ${dish.name}`}
                       >
-                        <PencilSquareIcon className="w-5 h-5" />
+                        <PencilSquareIcon className="w-4 h-4 sm:w-5 sm:h-5" />
                       </button>
                     )}
                     {onToggleStatus && (
                       <button
                         type="button"
                         onClick={() => onToggleStatus(dish)}
-                        className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
+                        className={`p-2 min-w-[36px] min-h-[36px] flex items-center justify-center rounded-xl transition-colors cursor-pointer focus:outline-hidden focus-visible:ring-2 focus-visible:ring-rms-burgundy/40 ${
                           dish.isAvailable
                             ? "text-gray-400 hover:text-red-500 hover:bg-red-50"
                             : "text-gray-400 hover:text-emerald-600 hover:bg-emerald-50"
@@ -156,20 +154,20 @@ export function DishTable({
                         aria-label={`${dish.isAvailable ? "Ngừng phục vụ" : "Kích hoạt"} món ${dish.name}`}
                       >
                         {dish.isAvailable ? (
-                          <XCircleIcon className="w-5 h-5" />
+                          <XCircleIcon className="w-4 h-4 sm:w-5 sm:h-5" />
                         ) : (
-                          <CheckCircleIcon className="w-5 h-5" />
+                          <CheckCircleIcon className="w-4 h-4 sm:w-5 sm:h-5" />
                         )}
                       </button>
                     )}
                     <button
                       type="button"
                       onClick={() => onViewDetail(dish)}
-                      className="p-1.5 rounded-lg text-gray-400 hover:text-rms-burgundy hover:bg-rms-burgundy/5 transition-colors cursor-pointer"
+                      className="p-2 min-w-[36px] min-h-[36px] flex items-center justify-center rounded-xl text-gray-400 hover:text-rms-burgundy hover:bg-rms-burgundy/5 transition-colors cursor-pointer focus:outline-hidden focus-visible:ring-2 focus-visible:ring-rms-burgundy/40"
                       title="Xem chi tiết"
                       aria-label={`Xem chi tiết ${dish.name}`}
                     >
-                      <EyeIcon className="w-5 h-5" />
+                      <EyeIcon className="w-4 h-4 sm:w-5 sm:h-5" />
                     </button>
                   </div>
                 </td>

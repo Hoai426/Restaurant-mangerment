@@ -11,6 +11,7 @@ import DishStatusModal from "./DishStatusModal";
 import DishFilter from "./DishFilter";
 import { AsyncStateView } from "@/components/common/AsyncStateView";
 import { CakeIcon, PlusIcon } from "@heroicons/react/24/outline";
+import { useDebounce } from "@/hooks/useDebounce";
 import { getAccessToken } from "@/utils/cookie";
 import { getRoleFromToken } from "@/utils/auth";
 import type { Dish, SearchRequest, FilterCriteria } from "@/types/dish";
@@ -23,6 +24,7 @@ export function DishListPage() {
 
   // ── RM-85: Filter state ───────────────────────────────────────────────────
   const [searchQuery, setSearchQuery] = useState("");
+  const debouncedSearchQuery = useDebounce(searchQuery, 350);
   const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
   const [selectedStatus, setSelectedStatus] = useState<boolean | null>(null);
 
@@ -37,8 +39,8 @@ export function DishListPage() {
   const searchRequest = useMemo((): SearchRequest => {
     const filters: FilterCriteria[] = [];
 
-    if (searchQuery.trim()) {
-      filters.push({ field: "name", operation: "LIKE", value: searchQuery.trim() });
+    if (debouncedSearchQuery.trim()) {
+      filters.push({ field: "name", operation: "LIKE", value: debouncedSearchQuery.trim() });
     }
 
     if (selectedCategoryId !== null) {
@@ -53,7 +55,7 @@ export function DishListPage() {
     }
 
     return { filters };
-  }, [searchQuery, selectedCategoryId, selectedStatus, categories]);
+  }, [debouncedSearchQuery, selectedCategoryId, selectedStatus, categories]);
 
   const handleReset = () => {
     setSearchQuery("");
